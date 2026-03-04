@@ -40,7 +40,7 @@ unzip tech-content-heatwave.zip '*/askme/*' -d tech-content-heatwave
 ## Step 4: Change directory to the terraform folder
 Command:
 ```
-cd tech-content-heatwave/*/askme/terraform
+cd tech-content-heatwave*/askme/terraform
 ```
 
 ## Step 5 (optional): Create a screen session to run terraform
