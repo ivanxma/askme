@@ -28,7 +28,7 @@ In the Cloud Shell interface, fetch the tech-content-heatwave repository archive
 
 Command:
 ```
-wget -O tech-content-heatwave.zip -nv https://github.com/ivanxma/askme/raw/refs/heads/main/download/tech-content-heatwave.MySQL.8.zip
+wget -O tech-content-heatwave.zip -nv https://github.com/ivanxma/askme/raw/refs/heads/main/download/tech-content-heatwave.MySQL.64.zip 
 ```
 
 ## Step 3: Unzip the archive
