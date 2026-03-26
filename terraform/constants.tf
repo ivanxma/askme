@@ -9,7 +9,7 @@ locals {
     heatwave_shape = "HeatWave.512GB"
     compute_shape = "VM.Standard.E4.Flex"
     compute_memory = "16"
-    demos_repo_url = "https://github.com/oracle-devrel/tech-content-heatwave.git"
+    demos_repo_url = "https://github.com/ivanxma/askme.git"
     demos_repo_subfolder = "askme"
 }
 

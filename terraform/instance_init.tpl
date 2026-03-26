@@ -46,6 +46,10 @@ git -C $REPO_HOME_FOLDER pull origin $REPO_BRANCH >> $INSTALL_LOGS 2>&1
 python3 -m venv $ASKME_ENV_PATH >> $INSTALL_LOGS 2>&1
 $ASKME_ENV_PATH/bin/pip install -r $REQUIREMENTS_FILEPATH >> $INSTALL_LOGS 2>&1
 
+PYBIN=$(readlink -f /home/opc/demos/venv/bin/python)
+setcap 'cap_net_bind_service=+ep' "$PYBIN"
+getcap "$PYBIN"
+
 # Create the services
 : > $MAIN_SERVICE_FILEPATH
 echo "[Unit]" >> $MAIN_SERVICE_FILEPATH
@@ -78,6 +82,12 @@ echo "ExecStart=$ASKME_ENV_PATH/bin/python $SETUP_FILEPATH" >> $SETUP_SERVICE_FI
 echo "" >> $SETUP_SERVICE_FILEPATH
 echo "[Install]" >> $SETUP_SERVICE_FILEPATH
 echo "WantedBy=default.target" >> $SETUP_SERVICE_FILEPATH
+
+# set up firewall
+
+firewall-cmd --permanent --zone=public --remove-port=8501/tcp
+firewall-cmd --permanent --zone=public --remove-port=80/tcp
+firewall-cmd --reload
 
 # Set repo file permission
 chown -R opc:opc $REPO_HOME_FOLDER >> $INSTALL_LOGS 2>&1
