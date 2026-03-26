@@ -1,188 +1,87 @@
 [![License: UPL](https://img.shields.io/badge/license-UPL-green)](https://img.shields.io/badge/license-UPL-green) [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=oracle-devrel_tech-content-heatwave)](https://sonarcloud.io/dashboard?id=oracle-devrel_tech-content-heatwave)
 
-# Deploy AskME resources with terraform
+# HeatWave GenAI Apps: AskME
+AskME is a suite of features designed to empower users to maximize the potential of their data utilizing cutting-edge artificial intelligence capabilities offered by HeatWave GenAI. This comprehensive solution offers the following functionalities:
 
-This section explains how to deploy AskME in your tenancy, using the OCI Cloud Shell and terraform. The following resources are automatically created during the process:
--	A dynamic group and a policy in the root compartment
--	A Compartment for the AskME resources
--	An Object Storage bucket containing two documents
--	A Compute Instance to run the AskME app
--	A MySQL DBSystem with a HeatWave cluster
--	A Vault, a Vault key and three Vault secrets
--	A VCN with an Internet Gateway, two Security Lists and two Subnets
+1.	Find Relevant Documents: Users can provide a prompt, and AskME will retrieve and present relevant documents in a user-friendly manner.
 
-The application can then be accessed from your local machine, using local port forwarding, as detailed in [step 8](#step-8-use-askme).
+2.	Free-Style Answer Generation: Users can ask questions, and AskME will include relevant information from the knowledge base to answer the question.
 
-## Step 1: Open OCI Cloud Shell
-Sign In to [your OCI tenancy](http://cloud.oracle.com/), switch to a [region supporting OCI Generative AI](https://docs.oracle.com/en-us/iaas/Content/generative-ai/overview.htm#regions) (e.g: US Midwest), and open the Cloud Shell.
-You need to have the [Administrator role](https://docs.oracle.com/en-us/iaas/Content/Identity/roles/understand-administrator-roles.htm) to deploy the AskME resources in your tenancy.
+3.	Summarized Answer Generation: Users can ask questions, and AskME will summarize relevant information from the knowledge base which is related to the question.
 
-![OCI starting page](assets/oci_home_page.png)
+4.	Chatbot Functionality: AskME allows users to ask follow-up questions and review their chat history.
 
-![OCI starting page, developer tools](assets/oci_home_page_dev_tools.png)
+5.	Knowledge Base Management: Users can create and delete the vector tables.
 
-![OCI starting page, cloud shell](assets/oci_home_page_cloud_shell.png)
+## Prerequisite
 
-## Step 2: Get the repository archive
-In the Cloud Shell interface, fetch the tech-content-heatwave repository archive.
+You must have an OCI account. [Click here](https://docs.oracle.com/en/cloud/paas/content-cloud/administer/create-and-activate-oracle-cloud-account.html) for more information about Oracle Cloud account creation and activation. Free-tier accounts are currently not supported for the deployment of AskME resources.
 
-Command:
-```
-wget -O tech-content-heatwave.zip -nv https://github.com/ivanxma/askme/raw/refs/heads/main/download/tech-content-heatwave.MySQL.64.zip 
-```
+There are required OCI resources (see the [Terraform documentation](./terraform/README.md) for more information) that are needed for this tutorial.
 
-## Step 3: Unzip the archive
-Command:
-```
-unzip tech-content-heatwave.zip '*/askme/*' -d tech-content-heatwave
-```
+## Getting Started: answer questions using your documents
 
-## Step 4: Change directory to the terraform folder
-Command:
-```
-cd tech-content-heatwave*/askme/terraform
-```
+### Create a vector table
 
-## Step 5 (optional): Create a screen session to run terraform
-Command:
-```
-screen -S askme_session
-```
+In the AskME app, it is easy to use your documents to create a new vector table.
 
-## Step 6: Run the setup script
-Run the script `askme_setup.sh`, and follow the instructions. Additional information will be asked by the script to setup the DBSystem and the compute instance.
+<div style="text-align: center;" >
+    <img src="assets/askme_kb_interface.png" alt="AskME Knowledge Base interface" width="72%" >
+</div>
 
-Command:
-```
-sh askme_setup.sh
-```
+From the `Knowledge Base Management` tab (${\textsf{\color{red}1}}$), under `Create Vector Table` (${\textsf{\color{red}2}}$), you can choose to upload one or more documents to AskME (${\textsf{\color{red}3}}$):
+- Here is a sample document you can download and use for that purpose: [Onboarding Checklist for New Hires at Nexus Innovations.pdf](./assets/Onboarding%20Checklist%20for%20New%20Hires%20at%20Nexus%20Innovations.pdf)<br />
+- Feel free to use your own documents to try the vector table creation.
 
-![Cloud Shell: Run deployment script](assets/cloud_shell_script.png)
+After having browsed and selected the relevant files, you can change the vector table name if the default one does not match your needs (${\textsf{\color{red}4}}$).<br />
+This name will be used to identify the vector table, and may correspond to the common denominator of all selected files.
 
-### Step 6.a: Compartment name
+Then click on the `Upload` button to start the vector table creation process (${\textsf{\color{red}5}}$).<br />
+For the sample document provided earlier, this process should take 30-60 seconds. It may take several minutes if multiple files/bigger files are selected.
 
-Name of the AskME demo compartment to create (default: `heatwave-genai-askme`).
+Once the vector table has been created, a green message is displayed, explaining that the table creation was successful, and the new table name should be added to the `Selected Vector Tables` list (${\textsf{\color{red}6}}$).
+<br />
 
-If your tenancy already contains a compartment with the default name `heatwave-genai-askme`, please provide another compartment name and press Enter. Otherwise, no need to provide a value, press Enter and the default value will be used.
+### Use the vector table to answer questions
 
-![Deployment script: compartment input parameter](assets/cloud_shell_script_compartment.png)
+Any existing vector table can be used in AskME to generate an accurate answer, with references to the original documents.
 
+<div style="text-align: center;" >
+    <img src="assets/askme_answer_interface.png" alt="AskME free-style answer" width="72%" >
+</div>
 
-### Step 6.b: Allowed IPv4 CIDR block
+From the `Free-style Answer` tab (${\textsf{\color{red}1}}$), you can enter your question in the input field (${\textsf{\color{red}3}}$).<br />
+Here, we choose to ask a question related to the sample document uploaded in the previous section: *What are the onboarding steps for new hires at Nexus Innovation?*
 
-Set of IPv4 addresses (CIDR notation) allowed to connect to the compute instance.
+Please make sure that all vector tables needed for the question are selected in the Knowledge Base Selection area (${\textsf{\color{red}2}}$), and then you can click on the `Answer Question` button (${\textsf{\color{red}4}}$).
 
-The CIDR notation follows the format: `a.b.c.d/e` where `a`, `b`, `c` and `d` are numbers between 0 and 255, and `e` is a number between 0 and 32. More information about the CIDR block notation in the [Network Overview](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/overview.htm#:~:text=CIDR%20NOTATION) page.
+The answer should appear under the `Answer Question` button after a few seconds, followed by a clickable list of document references that have been used to generate the answer.
 
-Use `0.0.0.0/0` to indicate all IP addresses. The prefix is required (for example, include the /32 if specifying an individual IP address). For more information, check the [Security Rules](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/securityrules.htm) page.
+## Contributing
 
-![Deployment script: IPv4 CIDR block input parameter](assets/cloud_shell_script_ip_cidr.png)
+This project is open source.  Please submit your contributions by forking this repository and submitting a pull request!  Oracle appreciates any contributions that are made by the open source community.
 
-### Step 6.c: SSH authorized key
+## Acknowledgments
 
-Content of the SSH public key file (OpenSSH format) located in your local machine. More information about SSH keys in the [Key Pair management and generation](https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/managingkeypairs.htm) page.
+- [Oracle Cloud Infrastructure (OCI)](https://www.oracle.com/cloud/)
+- [Streamlit Documentation](https://docs.streamlit.io/)
 
-![Deployment script: SSH authorized key input parameter](assets/cloud_shell_script_ssh.png)
+## Security
 
-## Step 7: Resource deployment
-Wait until the terraform deployment finishes. Expected deployment time: 30-40 minutes.
+Please consult the [security guide](./SECURITY.md) for our responsible security
+vulnerability disclosure process.
 
-## Step 8: Use AskME
-Connect to the AskME compute instance and access the streamlit page.
-Follow the instructions provided in the Cloud Shell output. The instructions should look similar to this:
-```
-================================================
-Open a terminal in your local computer, and run:
-  ssh -L 8501:localhost:8501 opc@x.x.x.x
-Then in your web browser, open the URL:
-  127.0.0.1:8501
-================================================
-```
+## License
 
-This information can be displayed again with the command `sh askme_output.sh` from the location described in [step 4](#step-4-change-directory-to-the-terraform-folder).
+Copyright (c) 2025 Oracle and/or its affiliates.
 
+Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-# Cleanup AskME resources with terraform
+See [LICENSE](LICENSE) for more details.
 
-This section explains how to remove AskME resources from your tenancy, using the OCI Cloud Shell and terraform.
+For third party licenses, see [THIRD_PARTY_LICENSES](licenses/THIRD_PARTY_LICENSES.txt).
 
-#### Warning: Cleanup setup requirement
-Please make sure that the AskME resources have been created following the [deployment instructions](#deploy-askme-resources-with-terraform), and that the setup folders/files located in [deployment step 4](#step-4-change-directory-to-the-terraform-folder) have not been modified or removed since the last deployment.
+For HeatWave User Guide legal information, see the [Legal Notices] (https://dev.mysql.com/doc/heatwave/en/preface.html#legalnotice).
 
-More specifically, please make sure that the file `terraform.tfstate` still exists there. If not, all resources described in the [deployment instructions](#deploy-askme-resources-with-terraform) need to be removed manually.
+ORACLE AND ITS AFFILIATES DO NOT PROVIDE ANY WARRANTY WHATSOEVER, EXPRESS OR IMPLIED, FOR ANY SOFTWARE, MATERIAL OR CONTENT OF ANY KIND CONTAINED OR PRODUCED WITHIN THIS REPOSITORY, AND IN PARTICULAR SPECIFICALLY DISCLAIM ANY AND ALL IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A PARTICULAR PURPOSE.  FURTHERMORE, ORACLE AND ITS AFFILIATES DO NOT REPRESENT THAT ANY CUSTOMARY SECURITY REVIEW HAS BEEN PERFORMED WITH RESPECT TO ANY SOFTWARE, MATERIAL OR CONTENT CONTAINED OR PRODUCED WITHIN THIS REPOSITORY. IN ADDITION, AND WITHOUT LIMITING THE FOREGOING, THIRD PARTIES MAY HAVE POSTED SOFTWARE, MATERIAL OR CONTENT TO THIS REPOSITORY WITHOUT ANY REVIEW. USE AT YOUR OWN RISK.
 
-#### Warning: Cleanup retention period
-There is a retention period of 30 days before the OCI Vault can be removed, blocking the compartment deletion. Please rerun the [cleanup step 2](#step-2-run-the-cleanup-script) again after 30 days to complete the cleanup process.
-
-## Step 1: Remove Vector Tables in the AskME app (if any)
-Follow the instructions in [step 8](#step-8-use-askme) to access the streamlit page.
-In the `Knowledge Base Management` tab, go to the section `Reset Knowledge Base` and follow the page instructions to remove all vector store tables.
-
-![Remove Vector Tables from AskME](assets/askme_reset_kb.png)
-
-## Step 2: Run the cleanup script
-Follow the instructions in [deployment step 1](#step-1-open-oci-cloud-shell) and [deployment step 4](#step-4-change-directory-to-the-terraform-folder) to use the Cloud Shell from the right location.
-
-Run the script `sh askme_cleanup.sh`, and follow the instructions. Additional information will be asked by the script to choose the right compartment name.
-
-Command:
-```
-sh askme_cleanup.sh
-```
-
-![Cloud Shell: Run deployment script](assets/cloud_shell_script_cleanup.png)
-
-### Step 2.a: Compartment name
-
-Name of the AskME demo compartment to delete (default: `heatwave-genai-askme`).
-
-If you used a custom compartment name in [deployment step 6.a](#step-6a-compartment-name), please provide the same compartment name here and press Enter. Otherwise, no need to provide a value, press Enter and the default value will be used.
-
-![Cleanup script: compartment input parameter](assets/cloud_shell_script_compartment.png)
-
-
-# Troubleshooting
-
-## Compartment already exists
-
-![Troubleshooting: compartment already exists](assets/troubleshooting_compartment_exists.png)
-
-If the compartment already exists in your tenancy, please rerun the [step 6](#step-6-run-the-setup-script) and specify another compartment name in [step 6.a](#step-6a-compartment-name).
-
-## Current OCI region does not support Generative AI
-
-![Troubleshooting: region does not support GenAI](assets/troubleshooting_region_genai_support.png)
-
-Please close the current Cloud Shell session:
-
-![Exit Cloud Shell](assets/cloud_shell_exit.png)
-
-![Exit Cloud Shell Confirm](assets/cloud_shell_exit_confirm.png)
-
-Then change the OCI Console region to a [region supporting OCI Generative AI](https://docs.oracle.com/en-us/iaas/Content/generative-ai/overview.htm#regions) (e.g: US Midwest):
-
-![Change OCI Region](assets/oci_home_page_change_region.png)
-
-Then reopen the Cloud Shell ([step 1](#step-1-open-oci-cloud-shell)) and in the same folder as in [step 4](#step-4-change-directory-to-the-terraform-folder), please rerun [step 6](#step-6-run-the-setup-script).
-
-## Compartment name length must be between 4 and 20
-
-![Troubleshooting: bad compartment name format](assets/troubleshooting_compartment_name_format.png)
-
-Please rerun [step 6](#step-6-run-the-setup-script) and use a smaller/longer compartment name in [step 6.a](#step-6a-compartment-name).
-
-## Invalid IPv4 CIDR block notation
-
-![Troubleshooting: bad IPv4 CIDR format](assets/troubleshooting_cidr_format.png)
-
-Please rerun [step 6](#step-6-run-the-setup-script) and provide a valid IPv4 block range in [step 6.b](#step-6b-allowed-ipv4-cidr-block), following the CIDR block notation.
-
-More information about the CIDR block notation in the [Network Overview](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/overview.htm#:~:text=CIDR%20NOTATION) page.
-
-## The SSH public key value must follow the OpenSSH format
-
-![Troubleshooting: bad SSH public key format](assets/troubleshooting_ssh_key_format.png)
-
-Please rerun [step 6](#step-6-run-the-setup-script) and provide a valid SSH public key in [step 6.c](#step-6c-ssh-authorized-key), following the OpenSSH format.
-
-More information about SSH keys in the [Key Pair management and generation](https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/managingkeypairs.htm) page.
