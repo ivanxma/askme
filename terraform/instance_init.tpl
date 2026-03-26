@@ -7,7 +7,8 @@ set -e  # Exit script if any command fails
 REPO_URL="${REPO_URL}"
 REPO_SUBFOLDER="${REPO_SUBFOLDER}"
 # TODO: change to "main"
-REPO_BRANCH="tech-content-heatwave_askme"
+# REPO_BRANCH="tech-content-heatwave_askme"
+REPO_BRANCH="main"
 
 #REVISED_GENAI_HELPER="https://raw.githubusercontent.com/ivanxma/askme/refs/heads/main/utils/genai_helper.py"
 GENAI_HELPER="$REPO_HOME_FOLDER/askme/utils/genai_helper.py"
@@ -37,10 +38,9 @@ python3 -m pip install --user oci-cli >> $INSTALL_LOGS 2>&1
 git init $REPO_HOME_FOLDER >> $INSTALL_LOGS 2>&1
 git -C $REPO_HOME_FOLDER remote add -f origin $REPO_URL >> $INSTALL_LOGS 2>&1
 git -C $REPO_HOME_FOLDER config core.sparseCheckout true >> $INSTALL_LOGS 2>&1
-git -C $REPO_HOME_FOLDER sparse-checkout set $REPO_SUBFOLDER >> $INSTALL_LOGS 2>&1
+# git -C $REPO_HOME_FOLDER sparse-checkout set $REPO_SUBFOLDER >> $INSTALL_LOGS 2>&1
+git -C $REPO_HOME_FOLDER sparse-checkout set '*' >> $INSTALL_LOGS 2>&1
 git -C $REPO_HOME_FOLDER pull origin $REPO_BRANCH >> $INSTALL_LOGS 2>&1
-# mv $GENAI_HELPER $GENAI_HELPER.old
-# wget $REVISED_GENAI_HELPER -O $GENAI_HELPER >> $INSTALL_LOGS 2>&1
 
 # Install python environment and dependencies
 python3 -m venv $ASKME_ENV_PATH >> $INSTALL_LOGS 2>&1
